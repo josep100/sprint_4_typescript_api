@@ -16,7 +16,6 @@ export const fetchJoke = async () => {
         return jokeObject.joke;
     }catch (error) {
         if (error instanceof Error) {
-             console.error(error.message);
              return error.message;
         }
     }   

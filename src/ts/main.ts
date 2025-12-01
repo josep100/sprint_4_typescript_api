@@ -2,7 +2,7 @@ import { fetchJoke } from "./jokes.service"
 
 
 const app = document.querySelector<HTMLDivElement>('#app');
-const btnNextJoke = document.querySelector<HTMLButtonElement>('#nextJoke')
+const btnNextJoke = document.querySelector<HTMLButtonElement>('#nextJoke');
 const div = document.createElement("div");
 let text = document.createTextNode("");
 
