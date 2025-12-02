@@ -1,0 +1,56 @@
+/* normalize.css - versión minimalista */
+
+/* Box sizing global */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Reset márgenes y padding */
+body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd {
+  margin: 0;
+  padding: 0;
+}
+
+/* Body básico */
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-family: system-ui, sans-serif;
+  background-color: #fff;
+  color: #000;
+}
+
+/* Listas */
+ul, ol {
+  list-style: none;
+  padding-left: 0;
+}
+
+/* Imágenes */
+img, picture {
+  max-width: 100%;
+  display: block;
+}
+
+/* Tablas */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* Enlaces */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Formularios */
+button, input, select, textarea {
+  font: inherit;
+  margin: 0;
+}
+
+/* Reglas útiles para HTML5 */
+main {
+  display: block;
+}

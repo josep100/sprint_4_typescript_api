@@ -1,0 +1,21 @@
+#contentJoke{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#contentJoke h1{
+    margin-bottom: 100px;
+}
+
+#contentJoke p{
+    margin-bottom: 50px;
+}
+
+header{
+    margin-bottom: 200px;
+}
+
+#tiempo {
+    padding: 23px;
+}
