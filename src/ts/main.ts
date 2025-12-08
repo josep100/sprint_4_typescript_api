@@ -1,4 +1,5 @@
-import { fetchJoke, registerScore,reportAcudits } from "./jokes.service";
+import { fetchData, registerScore,reportAcudits} from "./jokes.service";
+import type { Joke, WeatherResponse } from './jokes.service';
 
 // Referencias al contenedor principal
 const app = document.querySelector<HTMLDivElement>("#app");
@@ -13,7 +14,7 @@ let btnNextJoke: HTMLButtonElement;
 let btnBadJoke: HTMLButtonElement;
 let btnMediumJoke: HTMLButtonElement;
 let btnGoodJoke: HTMLButtonElement;
-let joke: string;
+let joke: Joke;
 
 // Crear la estructura del DOM
 const createUI = () => {
@@ -60,15 +61,30 @@ const createUI = () => {
 
 // Cargar un chiste y actualizar el <p>
 const loadJoke = async () => {
-    joke = await fetchJoke() ?? "";
-    pJoke.textContent = joke || "No se pudo cargar el chiste";
+    try {
+        joke = await fetchData<Joke>("https://icanhazdadjoke.com/");
+        pJoke.textContent = joke.joke;
+    } catch (err) {
+        console.error("No se pudo cargar el chiste");
+    }
+}
+
+const loadWeather = async () => {
+    const pTiempo = document.getElementById("tiempo") as HTMLParagraphElement;
+    try {
+        const weather = await fetchData<WeatherResponse>("https://api.open-meteo.com/v1/forecast?latitude=41.38879&longitude=2.15899&current_weather=true");
+        console.log("tiempo:" + weather.current_weather.temperature);
+        pTiempo.textContent = `${weather.current_weather.temperature}`;
+    } catch (err) {
+        console.error("No se pudo cargar el tiempo");
+    }
 }
 
 export const setScore = (score: 0 | 1 | 2 | 3) => {
       let fechaActual = new Date();
       let date = fechaActual.toISOString();
       if(score !== 0)
-        registerScore({joke, score, date},reportAcudits);
+        registerScore({joke: joke.joke, score, date},reportAcudits);
 }
 
 // Configurar eventos
@@ -89,6 +105,7 @@ const setupEventListeners = () => {
 async function init() {
   createUI();
   setupEventListeners();
+  await loadWeather();
   await loadJoke(); // cargar primer chiste
 }
 

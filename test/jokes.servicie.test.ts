@@ -3,71 +3,69 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 // vi.mock('../src/ts/jokes.service.ts', () => ({
 //     registerScore: vi.fn(),
 // }));
-import { fetchJoke, registerScore, reportAcudits, ReportAcudits} from '../src/ts/jokes.service.ts';
+import { fetchData, registerScore, reportAcudits, ReportAcudits} from '../src/ts/jokes.service.ts';
 import { setScore } from '../src/ts/main';
 
+interface Joke {
+  joke: string;
+}
 
-describe('fetchJoke', () => {
+describe('fetchData', () => {
 
   // Limpiar los mocks después de cada test
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it('calls fetch and returns the joke string', async () => {
-    // Mock global fetch
-    (globalThis as any).fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: async () => ({ joke: "esto es un chiste" }),
-      })
-    );
+  it("calls fetch and returns the object as T", async () => {
+      // Arrange: mock de fetch
+      const mockResponse: Joke = { joke: "esto es un chiste" };
+      (globalThis as any).fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: async () => mockResponse,
+        })
+      );
 
-    // Llamada a la función
-    const joke = await fetchJoke();
+      const url = "https://icanhazdadjoke.com";
 
-    // Verificaciones
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith('https://icanhazdadjoke.com', {
-      headers: { Accept: "application/json" },
-    });
-    expect(joke).toBe("esto es un chiste");
+      // Act: llamamos a la función genérica
+      const result = await fetchData<Joke>(url);
+
+      // Assert: verificaciones
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(fetch).toHaveBeenCalledWith(url, {
+        headers: { Accept: "application/json" },
+      });
+      expect(result).toEqual(mockResponse);
   });
 
-  it('calls fetch and returns the response false', async () => {
-    // Mock global fetch
-    (globalThis as any).fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: false,
-      })
-    );
+  it("returns an error message when response.ok is false", async () => {
+      // Arrange: mock de fetch que devuelve ok: false
+      (globalThis as any).fetch = vi.fn(() =>
+        Promise.resolve({
+          ok: false,
+        })
+      );
 
-    // Llamada a la función
-    const joke = await fetchJoke();
+      const url = "https://icanhazdadjoke.com";
 
-    // Verificaciones
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith('https://icanhazdadjoke.com', {
-      headers: { Accept: "application/json" },
-    });
-    expect(joke).toBe("Ocurrió un error");
+      // Assert: verificamos que fetch fue llamado y que devolvió el mensaje de error
+      
+      await expect(fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error en la petición");
   });
 
-   it('calls fetch and returns connection failure error', async () => {
-    // Mock global fetch
-    (globalThis as any).fetch = vi.fn(() =>
-      Promise.reject(new Error("Ocurrió un error"))
-    );
+   it("returns an error message when fetch throws (connection failure)", async () => {
+      // Arrange: mock de fetch que simula un error de conexión
+      (globalThis as any).fetch = vi.fn(() =>
+        Promise.reject(new Error("Ocurrió un error"))
+      );
 
-    // Llamada a la función
-    const joke = await fetchJoke();
+      const url = "https://icanhazdadjoke.com";
 
-    // Verificaciones
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith('https://icanhazdadjoke.com', {
-      headers: { Accept: "application/json" },
-    });
-    expect(joke).toBe("Ocurrió un error");
+      // Assert: verificamos que fetch fue llamado y devolvió el mensaje de error
+      
+      await expect(fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error");
   });
 });
 

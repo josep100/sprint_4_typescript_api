@@ -1,7 +1,16 @@
-interface Joke {
+export interface Joke {
     id: string,
     joke: string,
     status: number
+}
+
+export interface WeatherResponse {
+  current_weather: {
+    temperature: number;
+    windspeed: number;
+    weathercode: number;
+    time: string;
+  };
 }
 
 export interface ReportAcudits {
@@ -12,22 +21,18 @@ export interface ReportAcudits {
 
 export const reportAcudits: ReportAcudits[] = [];
 
-export const fetchJoke = async () => {
+export const fetchData = async <T>(url: string): Promise<T> => {
+    const response = await fetch(url, {
+        headers: { Accept: "application/json" }
+    });
 
-    try{
-        const response = await fetch("https://icanhazdadjoke.com", {
-        headers: { Accept: "application/json"}});
-        
-         if(!response.ok) throw new Error("Ocurrió un error");
-        
-        const jokeObject: Joke = await response.json();
-        return jokeObject.joke;
-    }catch (error) {
-        if (error instanceof Error) {
-             return error.message;
-        }
-    }   
-}
+    if (!response.ok) {
+        throw new Error("Ocurrió un error en la petición");
+    }
+
+    const data = await response.json();
+    return data as T;
+};
 
 export const registerScore = (ScoreEntry: ReportAcudits, array:ReportAcudits []) => {
         array.push(ScoreEntry);
