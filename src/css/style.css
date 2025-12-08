@@ -19,3 +19,15 @@ header{
 #tiempo {
     padding: 23px;
 }
+
+article{
+    margin-bottom: 22px;
+}
+
+article button{
+    font-size: 3rem;
+    background-color: transparent;
+    border: none;
+    margin-right: 30px;
+    cursor: pointer;
+}

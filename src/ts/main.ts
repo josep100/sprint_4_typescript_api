@@ -1,18 +1,24 @@
-import { fetchJoke } from "./jokes.service";
+import { fetchJoke, registerScore,reportAcudits } from "./jokes.service";
 
 // Referencias al contenedor principal
 const app = document.querySelector<HTMLDivElement>("#app");
 
 // Elementos que vamos a usar
 let main: HTMLElement;
+let article: HTMLElement;
 let section: HTMLElement;
 let h1: HTMLHeadingElement;
 let pJoke: HTMLParagraphElement;
 let btnNextJoke: HTMLButtonElement;
+let btnBadJoke: HTMLButtonElement;
+let btnMediumJoke: HTMLButtonElement;
+let btnGoodJoke: HTMLButtonElement;
+let joke: string;
 
 // Crear la estructura del DOM
 const createUI = () => {
   main = document.createElement("main");
+  article = document.createElement("article");
   
   section = document.createElement("section");
   section.id = "contentJoke";
@@ -28,9 +34,23 @@ const createUI = () => {
   btnNextJoke.ariaLabel = "Mostrar un nuevo chiste";
   btnNextJoke.textContent = "Mostrar un nuevo chiste";
 
+  btnBadJoke = document.createElement("button");
+  btnBadJoke.textContent = "😞";
+  btnBadJoke.value = "1";
+  btnMediumJoke = document.createElement("button");
+  btnMediumJoke.textContent = "🙂";
+  btnMediumJoke.value = "2";
+  btnGoodJoke = document.createElement("button");
+  btnGoodJoke.textContent = "😄";
+  btnGoodJoke.value = "3";
+
   // Componer sección
+  article.appendChild(btnBadJoke);
+  article.appendChild(btnMediumJoke);
+  article.appendChild(btnGoodJoke);
   section.appendChild(h1);
   section.appendChild(pJoke);
+  section.appendChild(article);
   section.appendChild(btnNextJoke);
 
   // Componer main y añadir a app
@@ -40,13 +60,29 @@ const createUI = () => {
 
 // Cargar un chiste y actualizar el <p>
 const loadJoke = async () => {
-  const joke = await fetchJoke();
-  pJoke.textContent = joke || "No se pudo cargar el chiste";
+    joke = await fetchJoke() ?? "";
+    pJoke.textContent = joke || "No se pudo cargar el chiste";
+}
+
+export const setScore = (score: 0 | 1 | 2 | 3) => {
+      let fechaActual = new Date();
+      let date = fechaActual.toISOString();
+      if(score !== 0)
+        registerScore({joke, score, date},reportAcudits);
 }
 
 // Configurar eventos
 const setupEventListeners = () => {
-  btnNextJoke.addEventListener("click", loadJoke);
+    let score: 0 | 1 | 2 | 3 = 0;
+    btnNextJoke.addEventListener("click", () => {
+        loadJoke();
+        setScore(score);
+        score = 0;
+    });
+    article.addEventListener("click", (event) => {
+          const target = event.target as HTMLButtonElement;
+          score = parseInt(target.value) as 1 | 2 | 3;
+    });
 }
 
 // Inicializar la app

@@ -1,6 +1,10 @@
 // tests/fetchJoke.test.ts
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { fetchJoke } from '../src/ts/jokes.service.ts';
+// vi.mock('../src/ts/jokes.service.ts', () => ({
+//     registerScore: vi.fn(),
+// }));
+import { fetchJoke, registerScore, reportAcudits, ReportAcudits} from '../src/ts/jokes.service.ts';
+import { setScore } from '../src/ts/main';
 
 
 describe('fetchJoke', () => {
@@ -82,4 +86,37 @@ it('call to the function on click', async () => {
       
         expect(mockFn).toHaveBeenCalled();
 });
+
+it("save valid entry", () => {
+    
+    const ScoreEntry: ReportAcudits = {
+        joke: "esto es un chiste",
+        score: 1,
+        date: "2023-10-27"
+    };
+
+    const testReportAcudits: ReportAcudits[] = [];
+  
+
+    registerScore(ScoreEntry, testReportAcudits);
+
+    expect(testReportAcudits).toHaveLength(1);
+    
+});
+
+// it("save invalid entry", () => {
+    
+//     const score = 0;
+//     const joke = "esto es un chiste";
+//     const date = "2025-12-6";
+//     reportAcudits.length = 0;
+
+//     setScore(score);
+
+//     expect(registerScore).toHaveBeenCalled();
+// });
+
+
+
+
 

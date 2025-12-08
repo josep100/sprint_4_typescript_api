@@ -4,6 +4,14 @@ interface Joke {
     status: number
 }
 
+export interface ReportAcudits {
+    joke: string,
+    score: 0 | 1 | 2 | 3,
+    date: string
+}
+
+export const reportAcudits: ReportAcudits[] = [];
+
 export const fetchJoke = async () => {
 
     try{
@@ -19,6 +27,11 @@ export const fetchJoke = async () => {
              return error.message;
         }
     }   
+}
+
+export const registerScore = (ScoreEntry: ReportAcudits, array:ReportAcudits []) => {
+        array.push(ScoreEntry);
+        console.log(reportAcudits);
 }
 
 
