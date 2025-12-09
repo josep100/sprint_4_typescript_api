@@ -13,6 +13,13 @@ export interface WeatherResponse {
   };
 }
 
+export interface ChuckJoke {
+  icon_url: string;
+  id: string;
+  url: string;
+  value: string; // ← aquí está el chiste
+}
+
 export interface ReportAcudits {
     joke: string,
     score: 0 | 1 | 2 | 3,

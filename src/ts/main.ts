@@ -1,8 +1,12 @@
 import { fetchData, registerScore,reportAcudits} from "./jokes.service";
-import type { Joke, WeatherResponse } from './jokes.service';
+import type { Joke, WeatherResponse, ChuckJoke } from './jokes.service';
 
 // Referencias al contenedor principal
 const app = document.querySelector<HTMLDivElement>("#app");
+
+interface NormalizedJoke {
+    text: string;  // SIEMPRE este campo
+}
 
 // Elementos que vamos a usar
 let main: HTMLElement;
@@ -14,7 +18,9 @@ let btnNextJoke: HTMLButtonElement;
 let btnBadJoke: HTMLButtonElement;
 let btnMediumJoke: HTMLButtonElement;
 let btnGoodJoke: HTMLButtonElement;
-let joke: Joke;
+let joke: Joke | ChuckJoke;
+let urlJokes: string[] = [];
+let currentJoke: NormalizedJoke | null = null;
 
 // Crear la estructura del DOM
 const createUI = () => {
@@ -62,8 +68,20 @@ const createUI = () => {
 // Cargar un chiste y actualizar el <p>
 const loadJoke = async () => {
     try {
-        joke = await fetchData<Joke>("https://icanhazdadjoke.com/");
-        pJoke.textContent = joke.joke;
+        urlJokes = ["https://icanhazdadjoke.com/", "https://api.chucknorris.io/jokes/random"];
+        const randomIndex = Math.floor(Math.random() * urlJokes.length);
+        if (urlJokes[randomIndex].includes("icanhazdadjoke")) {
+             joke = await fetchData<Joke>(urlJokes[randomIndex]);
+             currentJoke = { text: joke.joke }; 
+             pJoke.textContent = currentJoke.text;
+        }
+
+        if (urlJokes[randomIndex].includes("chucknorris")) {
+             joke = await fetchData<ChuckJoke>(urlJokes[randomIndex]);
+             currentJoke = { text: joke.value }; 
+             pJoke.textContent = currentJoke.text;
+        }
+       
     } catch (err) {
         console.error("No se pudo cargar el chiste");
     }
@@ -84,7 +102,7 @@ export const setScore = (score: 0 | 1 | 2 | 3) => {
       let fechaActual = new Date();
       let date = fechaActual.toISOString();
       if(score !== 0)
-        registerScore({joke: joke.joke, score, date},reportAcudits);
+        registerScore({joke: currentJoke?.text ?? "Chiste no disponible", score, date},reportAcudits);
 }
 
 // Configurar eventos
