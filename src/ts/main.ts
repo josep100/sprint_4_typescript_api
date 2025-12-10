@@ -1,12 +1,11 @@
-import { fetchData, registerScore,reportAcudits} from "./jokes.service";
-import type { Joke, WeatherResponse, ChuckJoke } from './jokes.service';
+import { fetchData, registerScore} from "./service";
+import {weatherIcons, reportAcudits} from "./config";
+import type { Joke, WeatherResponse, ChuckJoke } from './config';
+import type {NormalizedJoke} from "./config";
+
 
 // Referencias al contenedor principal
 const app = document.querySelector<HTMLDivElement>("#app");
-
-interface NormalizedJoke {
-    text: string;  // SIEMPRE este campo
-}
 
 // Elementos que vamos a usar
 let main: HTMLElement;
@@ -29,6 +28,7 @@ const createUI = () => {
   
   section = document.createElement("section");
   section.id = "contentJoke";
+  section.className ="shape-1";
 
   h1 = document.createElement("h1");
   h1.textContent = "Preparat per riure?";
@@ -91,8 +91,9 @@ const loadWeather = async () => {
     const pTiempo = document.getElementById("tiempo") as HTMLParagraphElement;
     try {
         const weather = await fetchData<WeatherResponse>("https://api.open-meteo.com/v1/forecast?latitude=41.38879&longitude=2.15899&current_weather=true");
-        console.log("tiempo:" + weather.current_weather.temperature);
-        pTiempo.textContent = `${weather.current_weather.temperature}`;
+        const code = weather.current_weather.weathercode;
+        const icon = weatherIcons[code] ?? "❓";
+        pTiempo.textContent = `${icon} | ${weather.current_weather.temperature}ºC`;
     } catch (err) {
         console.error("No se pudo cargar el tiempo");
     }
@@ -112,6 +113,9 @@ const setupEventListeners = () => {
         loadJoke();
         setScore(score);
         score = 0;
+        const shapeClasses = ["shape-1", "shape-2", "shape-3", "shape-4"];
+        const randomIndex = Math.floor(Math.random() * 4);
+        section.className = shapeClasses[randomIndex];
     });
     article.addEventListener("click", (event) => {
           const target = event.target as HTMLButtonElement;

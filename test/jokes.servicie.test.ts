@@ -1,9 +1,7 @@
 // tests/fetchJoke.test.ts
 import { describe, it, expect, vi, afterEach } from 'vitest';
-// vi.mock('../src/ts/jokes.service.ts', () => ({
-//     registerScore: vi.fn(),
-// }));
-import { fetchData, registerScore, reportAcudits, ReportAcudits} from '../src/ts/jokes.service.ts';
+import * as jokeService from "../src/ts/service.ts";
+import type { ReportAcudits} from "../src/ts/config.ts";
 import { setScore } from '../src/ts/main';
 
 interface Joke {
@@ -30,7 +28,7 @@ describe('fetchData', () => {
       const url = "https://icanhazdadjoke.com";
 
       // Act: llamamos a la función genérica
-      const result = await fetchData<Joke>(url);
+      const result = await jokeService.fetchData<Joke>(url);
 
       // Assert: verificaciones
       expect(fetch).toHaveBeenCalledTimes(1);
@@ -52,7 +50,7 @@ describe('fetchData', () => {
 
       // Assert: verificamos que fetch fue llamado y que devolvió el mensaje de error
       
-      await expect(fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error en la petición");
+      await expect(jokeService.fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error en la petición");
   });
 
    it("returns an error message when fetch throws (connection failure)", async () => {
@@ -65,11 +63,12 @@ describe('fetchData', () => {
 
       // Assert: verificamos que fetch fue llamado y devolvió el mensaje de error
       
-      await expect(fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error");
+      await expect(jokeService.fetchData<Joke>(url)).rejects.toThrow("Ocurrió un error");
   });
 });
 
-it('call to the function on click', async () => {
+describe("Click the button that asks for a new joke", () => {
+    it('call to the function on click', async () => {
       
         const btnNextJoke = document.createElement("button");
         btnNextJoke.id = "nextJoke";
@@ -83,36 +82,37 @@ it('call to the function on click', async () => {
     
       
         expect(mockFn).toHaveBeenCalled();
+    });
 });
 
-it("save valid entry", () => {
-    
-    const ScoreEntry: ReportAcudits = {
-        joke: "esto es un chiste",
-        score: 1,
-        date: "2023-10-27"
-    };
+describe("validate the scoring of the jokes", () => {
+      it("save valid entry", () => {
+      
+        const ScoreEntry: ReportAcudits = {
+            joke: "esto es un chiste",
+            score: 1,
+            date: "2023-10-27"
+        };
 
-    const testReportAcudits: ReportAcudits[] = [];
-  
+        const testReportAcudits: ReportAcudits[] = [];
+      
 
-    registerScore(ScoreEntry, testReportAcudits);
+        jokeService.registerScore(ScoreEntry, testReportAcudits);
 
-    expect(testReportAcudits).toHaveLength(1);
-    
+        expect(testReportAcudits).toHaveLength(1);
+      
+    });
+
+    it("save invalid entry", () => {
+
+        const registerScore = vi.spyOn(jokeService, "registerScore").mockImplementation(() => {});
+
+        const score = 0;
+        setScore(score);
+
+        expect(registerScore).not.toHaveBeenCalled();
+    });
 });
-
-// it("save invalid entry", () => {
-    
-//     const score = 0;
-//     const joke = "esto es un chiste";
-//     const date = "2025-12-6";
-//     reportAcudits.length = 0;
-
-//     setScore(score);
-
-//     expect(registerScore).toHaveBeenCalled();
-// });
 
 
 
